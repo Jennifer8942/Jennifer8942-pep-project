@@ -22,7 +22,7 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
 
         // TODO: 
-        app.get("example-endpoint", this::exampleHandler);
+        app.get("/account", this::exampleHandler);
 
         return app;
     }
