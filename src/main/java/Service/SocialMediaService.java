@@ -34,7 +34,16 @@ public class SocialMediaService {
      * @return The newly added account if the add operation was sucessful, including account_id.  
      */
     public Account addAccount(Account account) {
-        Account newAccount = accountDAO.insertAccount(account);
+        String username = account.getUsername();
+        String password = account.getPassword();
+        Account newAccount = null;
+
+        if( username == null && password != null && password.length() >=4) {
+            Account existingAccount = accountDAO.getAccountByUsername(username);
+            if(existingAccount == null) {
+                newAccount = accountDAO.insertAccount(account);
+            }
+        }
         return newAccount;
     }
 

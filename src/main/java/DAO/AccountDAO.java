@@ -77,5 +77,27 @@ public class AccountDAO {
         return null;
     }
 
+    public Account getAccountByUsername(String username) {
+        Connection connection = ConnectionUtil.getConnection();
+        Account account = null;
+        try {
+            //Write SQL logic here
+            String sql = "SELECT account_id, username, password FROM account WHERE username = ?;";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while(rs.next()){
+                account = new Account(rs.getInt("account_id"), 
+                                              rs.getString("username"),
+                                              rs.getString("password"));
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return account;
+    }
+
 
 }
