@@ -1,7 +1,12 @@
 package Controller;
 
+import Model.Account;
+import Model.Message;
+import Service.SocialMediaService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
@@ -13,27 +18,24 @@ import io.javalin.http.Context;
  */
 public class SocialMediaController {
 
+    private SocialMediaService socialMediaService;
+
+    public SocialMediaController() {
+        socialMediaService = new SocialMediaService();
+    }
+
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
      * suite must receive a Javalin object from this method.
      * 
-     * ## 1: Our API should be able to process new User registrations. As a user, I should be able to create a new Account 
-     * on the endpoint POST localhost:8080/register
-     * ## 2: Our API should be able to process User logins. As a user, I should be able to verify my login on the endpoint 
-     * POST localhost:8080/login. 
-     * ## 3: Our API should be able to process the creation of new messages. As a user, I should be able to submit a new 
-     * post on the endpoint POST localhost:8080/messages. The request body will contain a JSON representation of a message, 
-     * which should be persisted to the database, but will not contain a message_id.
-     * ## 4: Our API should be able to retrieve all messages. As a user, I should be able to submit a GET request on the 
-     * endpoint GET localhost:8080/messages.
-     * ## 5: Our API should be able to retrieve a message by its ID. As a user, I should be able to submit a GET request on 
-     * the endpoint GET localhost:8080/messages/{message_id}.
-     * ## 6: Our API should be able to delete a message identified by a message ID. As a User, I should be able to submit a 
-     * DELETE request on the endpoint DELETE localhost:8080/messages/{message_id}.
-     * ## 7: Our API should be able to update a message text identified by a message ID. As a user, I should be able to 
-     * submit a PATCH request on the endpoint PATCH localhost:8080/messages/{message_id}. 
-     * ## 8: Our API should be able to retrieve all messages written by a particular user. As a user, I should be able to 
-     * submit a GET request on the endpoint GET localhost:8080/accounts/{account_id}/messages.
+     * ## 1: process new User registrations on the endpoint POST localhost:8080/register
+     * ## 2: process User logins on the endpoint POST localhost:8080/login
+     * ## 3: process the creation of new messages on the endpoint POST localhost:8080/messages
+     * ## 4: retrieve all messages on the endpoint GET localhost:8080/messages
+     * ## 5: retrieve a message by its ID on the endpoint GET localhost:8080/messages/{message_id}.
+     * ## 6: delete a message identified by a message ID on the endpoint DELETE localhost:8080/messages/{message_id}
+     * ## 7: update a message text identified by a message ID on the endpoint PATCH localhost:8080/messages/{message_id}
+     * ## 8: retrieve all messages written by a particular user on the endpoint GET localhost:8080/accounts/{account_id}/messages
      *
      * @return a Javalin app object which defines the behavior of the Javalin controller.
      */
@@ -42,15 +44,14 @@ public class SocialMediaController {
 
         // TODO: 
         
-        app.get("/account", this::exampleHandler);
-/*
-        Javalin app = Javalin.create();
-        app.post("/flights", this::postFlightHandler);
-        app.put("/flights/{flight_id}", this::updateFlightHandler);
-        app.get("/flights", this::getAllFlightsHandler);
-        app.get("/flights/departing/{departure_city}/arriving/{arrival_city}",
-                this::getAllFlightsDepartingFromCityArrivingToCityHandler);
-        return app;*/
+        app.post("/register", this::postAccountHandler);
+        app.post("/login", this::exampleHandler);
+        app.post("/messages", this::exampleHandler);
+        app.get("/messages", this::exampleHandler);
+        app.get("/messages/{message_id}", this::exampleHandler);
+        app.delete("/messages/{message_id}", this::exampleHandler);
+        app.patch("/messages/{message_id}", this::exampleHandler);
+        app.get("/account/{account_id/messages}",this::exampleHandler);
 
         return app;
     }
@@ -64,6 +65,7 @@ public class SocialMediaController {
     }
 
     /*
+     * Handler to post a new account
      * ## 1: Our API should be able to process new User registrations. 
      * As a user, I should be able to create a new Account on the endpoint POST localhost:8080/register. The body will 
      * contain a representation of a JSON Account, but will not contain an account_id.
@@ -74,9 +76,21 @@ public class SocialMediaController {
      *   be 200 OK, which is the default. The new account should be persisted to the database.
      * 
      * - If the registration is not successful, the response status should be 400. (Client error)
+     * @param ctx the context object handles information HTTP requests and generates responses within Javalin. It will
+     *            be available to this method automatically thanks to the app.post method.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
-    public void postAccount(Context context) {
-        //TODO
+    public void postAccountHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account postedAccount = socialMediaService.addAccount(account);
+        if(postedAccount == null) {
+            ctx.status(400);
+        } else {
+            ctx.json(mapper.writeValueAsString(postedAccount));
+        }
+
+        //TODO verify username password
     }
 
     /* 
@@ -112,7 +126,9 @@ public class SocialMediaController {
 
     As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
 
-    - The response body should contain a JSON representation of a list containing all messages retrieved from the database. It is expected for the list to simply be empty if there are no messages. The response status should always be 200, which is the default.
+    - The response body should contain a JSON representation of a list containing all messages retrieved from the 
+    database. It is expected for the list to simply be empty if there are no messages. The response status should 
+    always be 200, which is the default.
     */
     public Message[] getAllMessages() {
         return null;
@@ -124,10 +140,13 @@ public class SocialMediaController {
 
     As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages/{message_id}.
 
-    - The response body should contain a JSON representation of the message identified by the message_id. It is expected for the response body to simply be empty if there is no such message. The response status should always be 200, which is the default.
+    - The response body should contain a JSON representation of the message identified by the message_id. It is expected 
+    for the response body to simply be empty if there is no such message. The response status should always be 200, which 
+    is the default.
     */
-    public Message getMessage(Integer ID) {
-        return null;
+    public void getMessage(Context ctx) {
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        ctx.json(socialMediaService.getMessage(message_id));
     }
 
 
@@ -165,8 +184,5 @@ public class SocialMediaController {
      public Message[] getAllMessages(Account account) {
         return null;
      }   
-
-}
-
 
 }

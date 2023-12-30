@@ -85,7 +85,7 @@ public class SocialMediaService {
 
     - The response body should contain a JSON representation of the message identified by the message_id. It is expected for the response body to simply be empty if there is no such message. The response status should always be 200, which is the default.
     */
-    public Message getMessage(Integer ID) {
+    public Message getMessage(int ID) {
         return null;
     }
 
