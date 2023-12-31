@@ -52,7 +52,8 @@ public class AccountDAO {
     /*
      * Add an account record into the database which matches the values contained in the account object.
      * 
-     * @param account an object modelling an Account. the account object does not contain an account ID.
+     * @param account an object modelling an Account. the account object does not contain an account_id.
+     * @return The Account object matching the record inserted into the database, including an account_id.
      */
     public Account insertAccount(Account account) {
         Connection connection = ConnectionUtil.getConnection();
@@ -77,6 +78,12 @@ public class AccountDAO {
         return null;
     }
 
+    /*
+     * Get an account record from the database account table, which has a matching username.
+     * 
+     * @param username the account username.
+     * @return The Account with matching username and password, including account_id. 
+     */
     public Account getAccountByUsername(String username) {
         Connection connection = ConnectionUtil.getConnection();
         Account account = null;
@@ -98,6 +105,37 @@ public class AccountDAO {
         }
         return account;
     }
+
+    /*
+     * Get an account record from the database account table, which has login credentials matching the paramaters.
+     * 
+     * @param username the account username
+     * @param password the account password
+     * @return The Account with matching username and password, including account_id.
+     */
+    public Account getAccountByLogin(String username, String password) {
+        Connection connection = ConnectionUtil.getConnection();
+        Account account = null;
+        try {
+            //Write SQL logic here
+            String sql = "SELECT account_id, username, password FROM account WHERE username = ? and password = ?;";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while(rs.next()){
+                account = new Account(rs.getInt("account_id"), 
+                                              rs.getString("username"),
+                                              rs.getString("password"));
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return account;
+    }
+
 
 
 }

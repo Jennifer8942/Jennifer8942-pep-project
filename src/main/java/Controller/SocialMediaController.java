@@ -25,9 +25,9 @@ public class SocialMediaController {
     }
 
     /**
-     * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
-     * suite must receive a Javalin object from this method.
-     * 
+     * Creates a Javalin controller that has been set up to handle HTTP requests for the Social Media Application. 
+     *  
+     * The following request endpoints are supported:
      * ## 1: process new User registrations on the endpoint POST localhost:8080/register
      * ## 2: process User logins on the endpoint POST localhost:8080/login
      * ## 3: process the creation of new messages on the endpoint POST localhost:8080/messages
@@ -42,11 +42,9 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
 
-        // TODO: 
-        
         app.post("/register", this::postAccountHandler);
-        app.post("/login", this::exampleHandler);
-        app.post("/messages", this::exampleHandler);
+        app.post("/login", this::postLoginHandler);
+        app.post("/messages", this::postMessageHandler);
         app.get("/messages", this::exampleHandler);
         app.get("/messages/{message_id}", this::exampleHandler);
         app.delete("/messages/{message_id}", this::exampleHandler);
@@ -65,42 +63,52 @@ public class SocialMediaController {
     }
 
     /*
-     * Handler to post a new account
+     * Handler to process new user registration, or post a new account.  The registration will be successful if and only 
+     * if the username is not blank, the password is at least 4 characters long, and an Account with that username does 
+     * not already exist. 
      * 
      * The body will contain a representation of a JSON Account, but will not contain an account_id.
      * - If the registration is successful: the response body will contain a JSON of the Account, including its account_id. 
      *   The response status should be 200 OK, which is the default. The new account should be persisted to the database.
      * - If the registration is not successful, the response status should be 400. (Client error)
      * 
-     * @param ctx the context object handles information HTTP requests and generates responses within Javalin. It will
-     *            be available to this method automatically thanks to the app.post method.
+     * @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
     public void postAccountHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Account account = mapper.readValue(ctx.body(), Account.class);
-        Account postedAccount = socialMediaService.addAccount(account);
-        if(postedAccount == null) {
+        Account requestAccount = mapper.readValue(ctx.body(), Account.class);
+        Account responseAccount = socialMediaService.addAccount(requestAccount);
+        if(responseAccount == null) {
             ctx.status(400);
         } else {
-            ctx.json(mapper.writeValueAsString(postedAccount));
+            ctx.json(mapper.writeValueAsString(responseAccount));
         }
     }
 
     /* 
-     * ## 2: Our API should be able to process User logins. 
-     * As a user, I should be able to verify my login on the endpoint POST localhost:8080/login. The request 
-     * body will contain a JSON representation of an Account, not containing an account_id. In the future, this 
-     * action may generate a Session token to allow the user to securely use the site. We will not worry about this for now.
+     * Handler to process user logins or post account username and password.  The login will be successful 
+     * if and only if the username and password provided in the request body JSON match a real account 
+     * existing on the database.
      * 
-     * - The login will be successful if and only if the username and password provided in the request body JSON match 
-     *   a real account existing on the database. If successful, the response body should contain a JSON of the account 
+     * The request body will contain a JSON representation of an Account, not containing an account_id. 
+     * - If successful, the response body should contain a JSON of the account 
      *   in the response body, including its account_id. The response status should be 200 OK, which is the default.
      * - If the login is not successful, the response status should be 401. (Unauthorized)
+     * 
+     * @param ctx the context object handles HTTP requests and generates responses.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
-    public Account login(Account account) {
+    public void postLoginHandler(Context ctx) throws JsonProcessingException {
         // TODO
-        return null;
+        ObjectMapper mapper = new ObjectMapper();
+        Account requestAccount = mapper.readValue(ctx.body(), Account.class);
+        Account responseAccount = socialMediaService.login(requestAccount);
+        if(responseAccount == null) {
+            ctx.status(400);
+        } else {
+            ctx.json(mapper.writeValueAsString(responseAccount));
+        }
     }
 
     /*
@@ -110,9 +118,11 @@ public class SocialMediaController {
 
     - The creation of the message will be successful if and only if the message_text is not blank, is not over 255 characters, and posted_by refers to a real, existing user. If successful, the response body should contain a JSON of the message, including its message_id. The response status should be 200, which is the default. The new message should be persisted to the database.
     - If the creation of the message is not successful, the response status should be 400. (Client error)
+    @param ctx the context object handles HTTP requests and generates responses.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
-    public Message AddMessage(Message message) {
-        return null;
+    public void postMessageHandler(Context ctx) throws JsonProcessingException {
+       //TODO 
     }
 
     /*
@@ -123,22 +133,27 @@ public class SocialMediaController {
     - The response body should contain a JSON representation of a list containing all messages retrieved from the 
     database. It is expected for the list to simply be empty if there are no messages. The response status should 
     always be 200, which is the default.
+    @param ctx the context object handles HTTP requests and generates responses.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
-    public Message[] getAllMessages() {
-        return null;
+    public void getAllMessages(Context ctx) throws JsonProcessingException {
+        //TODO
     }
 
 
     /*
     ## 5: Our API should be able to retrieve a message by its ID.
 
+
     As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages/{message_id}.
 
     - The response body should contain a JSON representation of the message identified by the message_id. It is expected 
     for the response body to simply be empty if there is no such message. The response status should always be 200, which 
     is the default.
+    @param ctx the context object handles HTTP requests and generates responses.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
-    public void getMessage(Context ctx) {
+    public void getMessage(Context ctx) throws JsonProcessingException {
         int message_id = Integer.parseInt(ctx.pathParam("message_id"));
         ctx.json(socialMediaService.getMessage(message_id));
     }
@@ -151,9 +166,11 @@ public class SocialMediaController {
 
     - The deletion of an existing message should remove an existing message from the database. If the message existed, the response body should contain the now-deleted message. The response status should be 200, which is the default.
     - If the message did not exist, the response status should be 200, but the response body should be empty. This is because the DELETE verb is intended to be idempotent, ie, multiple calls to the DELETE endpoint should respond with the same type of response.
-    */
-    public boolean deleteMessage(Integer ID) {
-        return false;
+    @param ctx the context object handles HTTP requests and generates responses.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
+     */
+    public void deleteMessage(Context ctx) throws JsonProcessingException {
+        //TODO
     }
 
     /*
@@ -163,9 +180,11 @@ public class SocialMediaController {
 
     - The update of a message should be successful if and only if the message id already exists and the new message_text is not blank and is not over 255 characters. If the update is successful, the response body should contain the full updated message (including message_id, posted_by, message_text, and time_posted_epoch), and the response status should be 200, which is the default. The message existing on the database should have the updated message_text.
     - If the update of the message is not successful for any reason, the response status should be 400. (Client error)
+    @param ctx the context object handles HTTP requests and generates responses.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
-    public Message UpdateMessage(Message message) {
-        return null;
+    public void UpdateMessage(Context ctx) throws JsonProcessingException {
+        //TODO
     }
 
     /*
@@ -174,9 +193,11 @@ public class SocialMediaController {
     As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/accounts/{account_id}/messages.
 
     - The response body should contain a JSON representation of a list containing all messages posted by a particular user, which is retrieved from the database. It is expected for the list to simply be empty if there are no messages. The response status should always be 200, which is the default.
+    @param ctx the context object handles HTTP requests and generates responses.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
-     public Message[] getAllMessages(Account account) {
-        return null;
+     public void getAllAccountMessagesHandler(Context ctx) throws JsonProcessingException {
+        //TODO
      }   
 
 }

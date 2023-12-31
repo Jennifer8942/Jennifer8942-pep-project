@@ -26,9 +26,10 @@ public class SocialMediaService {
 
     /*
      * ## 1: Our API should be able to process new User registrations. 
+     * 
      * The registration requires these conditions: the username is not blank, the password is at least 4 
-     * characters long, and an Account with that username does not already exist. If all these conditions are met, 
-     * The new account should be persisted to the database.
+     * characters long, and an Account with that username does not already exist. If all these conditions 
+     * are met, The new account should be persisted to the database.
      * 
      * @param account an object representing a new account
      * @return The newly added account if the add operation was sucessful, including account_id.  
@@ -49,18 +50,19 @@ public class SocialMediaService {
 
     /* 
      * ## 2: Our API should be able to process User logins. 
-     * As a user, I should be able to verify my login on the endpoint POST localhost:8080/login. The request 
-     * body will contain a JSON representation of an Account, not containing an account_id. In the future, this 
-     * action may generate a Session token to allow the user to securely use the site. We will not worry about this for now.
      * 
-     * - The login will be successful if and only if the username and password provided in the request body JSON match 
-     *   a real account existing on the database. If successful, the response body should contain a JSON of the account 
-     *   in the response body, including its account_id. The response status should be 200 OK, which is the default.
-     * - If the login is not successful, the response status should be 401. (Unauthorized)
+     * The login will be successful if and only if the username and password provided match 
+     * a real account existing on the database. 
+     * 
+     * @param account an object representing an account with login information.
+     * @return The account with matching username and password, including account_id.
      */
     public Account login(Account account) {
-        // TODO
-        return null;
+        String username = account.getUsername();
+        String password = account.getPassword();
+        Account validAccount = accountDAO.getAccountByLogin(username, password); 
+        
+        return validAccount;
     }
 
     /*
