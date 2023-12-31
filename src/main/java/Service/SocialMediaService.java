@@ -39,7 +39,7 @@ public class SocialMediaService {
         String password = account.getPassword();
         Account newAccount = null;
 
-        if( username == null && password != null && password.length() >=4) {
+        if( username != null && password != null && password.length() >=4 && username.length() > 0) {
             Account existingAccount = accountDAO.getAccountByUsername(username);
             if(existingAccount == null) {
                 newAccount = accountDAO.insertAccount(account);
