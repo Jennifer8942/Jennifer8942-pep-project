@@ -77,7 +77,7 @@ public class SocialMediaService {
      * @param message an object representing a new message to be added to the database.
      * @return the message, including message_id.
      */
-    public Message AddMessage(Message message) {
+    public Message addMessage(Message message) {
         Message newMessage = null;
         if(message != null && message.getMessage_text() != null 
                 && message.getMessage_text().length() > 0 && message.getMessage_text().length() <= 255) {
@@ -120,9 +120,11 @@ public class SocialMediaService {
     */
     public Message deleteMessage(int message_id) {
         Message deletedMessage = messageDAO.getMessage(message_id);
-        boolean deleted = messageDAO.deleteMessage(message_id);
-        if( deleted ) {
-            return deletedMessage;
+        if(deletedMessage != null) {
+            boolean deleted = messageDAO.deleteMessage(message_id);
+            if( deleted ) {
+                return deletedMessage;
+            }
         }
         return null;
     }
@@ -140,8 +142,14 @@ public class SocialMediaService {
      * @param
      * @return
     */
-    public Message UpdateMessage(Message message) {
-        return null;
+    public Message updateMessage(Message message) {
+        Message newMessage = null;
+        if(message != null && message.getMessage_text() != null 
+                && message.getMessage_text().length() > 0 && message.getMessage_text().length() <= 255) {
+            
+            newMessage = messageDAO.updateMessage(message);
+        }
+        return newMessage;
     }
 
     /* 

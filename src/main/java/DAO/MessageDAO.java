@@ -43,7 +43,7 @@ public class MessageDAO {
                 Message message = new Message(rs.getInt("message_id"), 
                                               rs.getInt("posted_by"),
                                               rs.getString("message_text"), 
-                                              rs.getInt("time_posted_epoch"));
+                                              rs.getLong("time_posted_epoch"));
                 messages.add(message);
             }
         }catch(SQLException e){
@@ -73,7 +73,7 @@ public class MessageDAO {
                 Message message = new Message(rs.getInt("message_id"), 
                                               rs.getInt("posted_by"),
                                               rs.getString("message_text"), 
-                                              rs.getInt("time_posted_epoch"));
+                                              rs.getLong("time_posted_epoch"));
                 messages.add(message);
             }
         }catch(SQLException e){
@@ -90,6 +90,7 @@ public class MessageDAO {
      */
     public Message insertMessage(Message message) {
         Connection connection = ConnectionUtil.getConnection();
+        Message newMessage = null;
         try {
             //Write SQL logic here.
             String sql = "INSERT INTO message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?);" ;
@@ -104,12 +105,41 @@ public class MessageDAO {
             ResultSet pkrs = preparedStatement.getGeneratedKeys();
             if(pkrs.next()){
                 int generated_message_id = (int) pkrs.getLong(1);
-                message.setMessage_id(generated_message_id);
+                newMessage = getMessage(generated_message_id);
             }
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
-        return message;
+        return newMessage;
+    }
+
+    /*
+     * Update a message record into the database which matches the values contained in the message object.
+     * 
+     * @param message an object modelling a Message. The message object does not contain a message_id.
+     * @return The Message object matching the record updated in the database.
+     */
+    public Message updateMessage(Message message) {
+        Connection connection = ConnectionUtil.getConnection();
+        Message newMessage = null;
+        try {
+            //Write SQL logic here.
+            String sql = "UPDATE message SET message_text = ? WHERE message_id = ?;" ;
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            //write preparedStatement's setString and setInt methods here.
+            preparedStatement.setString(1, message.getMessage_text());
+            preparedStatement.setInt(2, message.getMessage_id());
+
+            int result = preparedStatement.executeUpdate();
+
+            if(result > 0){
+                newMessage = getMessage(message.getMessage_id());
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return newMessage;
     }
 
     /**
@@ -135,7 +165,7 @@ public class MessageDAO {
                  message = new Message(rs.getInt("message_id"), 
                                 rs.getInt("posted_by"),
                                 rs.getString("message_text"), 
-                                rs.getInt("time_posted_epoch"));
+                                rs.getLong("time_posted_epoch"));
             }
         }catch(SQLException e){
             System.out.println(e.getMessage());

@@ -123,7 +123,7 @@ public class SocialMediaController {
        //TODO 
        ObjectMapper mapper = new ObjectMapper();
        Message requestMessage = mapper.readValue(ctx.body(), Message.class);
-       Message responseMessage = socialMediaService.AddMessage(requestMessage);
+       Message responseMessage = socialMediaService.addMessage(requestMessage);
        if(responseMessage == null || responseMessage.getMessage_id() <= 0) {
             ctx.status(400);
        } else {
@@ -143,6 +143,11 @@ public class SocialMediaController {
      */
     public void getAllMessagesHandler(Context ctx) throws JsonProcessingException {
         //TODO
+        List<Message> messages = socialMediaService.getAllMessages();
+        if(messages != null ) {
+            ObjectMapper mapper = new ObjectMapper();
+            ctx.json(mapper.writeValueAsString(messages));
+        }
     }
 
     /* 
@@ -200,6 +205,14 @@ public class SocialMediaController {
      */
     public void updateMessageHandler(Context ctx) throws JsonProcessingException {
         //TODO
+        ObjectMapper mapper = new ObjectMapper();
+        Message requestMessage = mapper.readValue(ctx.body(), Message.class);
+        Message responseMessage = socialMediaService.updateMessage(requestMessage);
+        if(responseMessage == null || responseMessage.getMessage_id() <= 0) {
+             ctx.status(400);
+        } else {
+            ctx.json(mapper.writeValueAsString(responseMessage));
+        }
     }
 
     /* 
