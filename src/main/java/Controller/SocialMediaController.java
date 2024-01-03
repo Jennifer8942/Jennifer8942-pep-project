@@ -5,6 +5,9 @@ import Model.Message;
 import Service.SocialMediaService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -154,7 +157,11 @@ public class SocialMediaController {
     */
     public void getMessageHandler(Context ctx) throws JsonProcessingException {
         int message_id = Integer.parseInt(ctx.pathParam("message_id"));
-        ctx.json(socialMediaService.getMessage(message_id));
+        Message message = socialMediaService.getMessage(message_id);
+        if(message != null ) {
+            ObjectMapper mapper = new ObjectMapper();
+            ctx.json(mapper.writeValueAsString(message));
+        }
     }
 
 
@@ -171,7 +178,12 @@ public class SocialMediaController {
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
     public void deleteMessageHandler(Context ctx) throws JsonProcessingException {
-        //TODO
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = socialMediaService.deleteMessage(message_id);
+        if(message != null ) {
+            ObjectMapper mapper = new ObjectMapper();
+            ctx.json(mapper.writeValueAsString(message));
+        }
     }
 
     /*
@@ -202,6 +214,12 @@ public class SocialMediaController {
     */
      public void getAllAccountMessagesHandler(Context ctx) throws JsonProcessingException {
         //TODO
+        int account_id = Integer.parseInt(ctx.pathParam("account_id"));
+        List<Message> messages = socialMediaService.getAllMessages(account_id);
+        if(messages != null ) {
+            ObjectMapper mapper = new ObjectMapper();
+            ctx.json(mapper.writeValueAsString(messages));
+        }
      }   
 
 }

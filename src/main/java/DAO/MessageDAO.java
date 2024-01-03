@@ -52,6 +52,36 @@ public class MessageDAO {
         return messages;
     }
 
+     /**
+     * Retrieve all messages from the message table which have the requested account_id.
+     *
+     * @param ID the account_id requested.
+     * @return all messages.
+     */
+    public List<Message> getAllMessages(int account_id){
+        Connection connection = ConnectionUtil.getConnection();
+        List<Message> messages = new ArrayList<>();
+        try {
+            //Write SQL logic here
+            String sql = "SELECT message_id, posted_by, message_text, time_posted_epoch FROM message WHERE account_id = ?;";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, account_id);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()){
+                Message message = new Message(rs.getInt("message_id"), 
+                                              rs.getInt("posted_by"),
+                                              rs.getString("message_text"), 
+                                              rs.getInt("time_posted_epoch"));
+                messages.add(message);
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return messages;
+    }
+
     /*
      * Add a message record into the database which matches the values contained in the message object.
      * 
@@ -85,9 +115,10 @@ public class MessageDAO {
     }
 
     /**
+     * Get a message record from the database which has the requested message_id.
      * 
-     * @param ID
-     * @return
+     * @param ID the requested message_id.
+     * @return the Message object matching the record retrieved from the database.
      */
     public Message getMessage(int ID) {
         Connection connection = ConnectionUtil.getConnection();
@@ -113,5 +144,38 @@ public class MessageDAO {
         }
 
         return message;
+    }
+
+    /**
+     * Deleted a message record from the the database which has the requsted message_id.  
+     * 
+     * @param ID the requested message_id.
+     * @return the Message object matching the deleted record or null if no matching record existed.
+     */
+    public Message deleteMessage(int ID) {
+        Message deletedMessage = getMessage(ID);
+        if(deletedMessage != null) {
+
+            Connection connection = ConnectionUtil.getConnection();
+            try {
+                //Write SQL logic here.
+                String sql = "DELETE FROM message WHERE message_id = ?;" ;
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+                //write preparedStatement's setString and setInt methods here.
+                preparedStatement.setInt(1, ID);
+                ResultSet rs = preparedStatement.executeQuery();
+
+                /*if(rs.next()){
+                    newMessage = new Message(rs.getInt("message_id"), 
+                                    rs.getInt("posted_by"),
+                                    rs.getString("message_text"), 
+                                    rs.getInt("time_posted_epoch"));
+                }*/
+            }catch(SQLException e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return deletedMessage;
     }
 }

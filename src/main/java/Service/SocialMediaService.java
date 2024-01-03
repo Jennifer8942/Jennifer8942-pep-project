@@ -112,19 +112,20 @@ public class SocialMediaService {
         return messageDAO.getMessage(ID);
     }
 
-    /* TODO
+    /* 
      * ## 6: Our API should be able to delete a message identified by a message ID.
-     *  - The deletion of an existing message should remove an existing message from the database. If the message 
+     *  
+     * - The deletion of an existing message should remove an existing message from the database. If the message 
      *   existed, the response body should contain the now-deleted message. -
-     *  - If the message did not exist, the response status should be 200, but the response body should be empty.
-     *  This is because the DELETE verb is intended to be idempotent, ie, multiple calls to the DELETE endpoint should 
-     * respond with the same type of response.
+     * - If the message did not exist, the response status should be 200, but the response body should be empty.
+     *   This is because the DELETE verb is intended to be idempotent, ie, multiple calls to the DELETE endpoint 
+     *   should respond with the same type of response.
      * 
-     * @param
-     * @return
+     * @param ID the message_id for the message to be deleted.
+     * @return TODO (do we want to return boolean or Message?)
     */
-    public boolean deleteMessage(Integer ID) {
-        return false;
+    public Message deleteMessage(Integer ID) {
+        return messageDAO.deleteMessage(ID);
     }
 
     /* TODO
@@ -148,8 +149,8 @@ public class SocialMediaService {
      * @param
      * @return
      */
-     public Message[] getAllMessages(Account account) {
-        return null;
+     public List<Message> getAllMessages(int ID) {
+        return messageDAO.getAllMessages(ID);
      }   
 
 }
