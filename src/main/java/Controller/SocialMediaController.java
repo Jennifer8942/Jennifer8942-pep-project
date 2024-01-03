@@ -124,7 +124,7 @@ public class SocialMediaController {
        ObjectMapper mapper = new ObjectMapper();
        Message requestMessage = mapper.readValue(ctx.body(), Message.class);
        Message responseMessage = socialMediaService.AddMessage(requestMessage);
-       if(requestMessage == null) {
+       if(responseMessage == null || responseMessage.getMessage_id() <= 0) {
             ctx.status(400);
        } else {
            ctx.json(mapper.writeValueAsString(responseMessage));

@@ -80,10 +80,9 @@ public class SocialMediaService {
     public Message AddMessage(Message message) {
         Message newMessage = null;
         if(message != null && message.getMessage_text() != null 
-                && message.getMessage_text() != null && message.getMessage_text().length() > 0
-                && message.getMessage_text().length() <= 255) {
+                && message.getMessage_text().length() > 0 && message.getMessage_text().length() <= 255) {
             
-            Account isRealUser = accountDAO.getAccountByID(message.getMessage_id());
+            Account isRealUser = accountDAO.getAccountByID(message.getPosted_by());
             if(isRealUser != null) {
                 newMessage = messageDAO.insertMessage(message);
             }       
@@ -105,32 +104,37 @@ public class SocialMediaService {
     /*
      * ## 5: Our API should be able to retrieve a message by its ID.
      * 
-     * @ param ID the message_id for the requested message.
+     * @ param message_id the message_id for the requested message.
      * @ return an object representation of the message identified by the message_id. 
      */
-    public Message getMessage(int ID) {
-        return messageDAO.getMessage(ID);
+    public Message getMessage(int message_id) {
+        return messageDAO.getMessage(message_id);
     }
 
-    /* 
+    /* TODO
      * ## 6: Our API should be able to delete a message identified by a message ID.
-     *  
-     * - The deletion of an existing message should remove an existing message from the database. If the message 
-     *   existed, the response body should contain the now-deleted message. -
-     * - If the message did not exist, the response status should be 200, but the response body should be empty.
-     *   This is because the DELETE verb is intended to be idempotent, ie, multiple calls to the DELETE endpoint 
-     *   should respond with the same type of response.
      * 
-     * @param ID the message_id for the message to be deleted.
-     * @return TODO (do we want to return boolean or Message?)
+     * @param message_id the message_id for the message to be removed from the database.
+     * @return an object representation of the message identified by the message_id, which has been removed
+     *         from the database.  Returns null if no message exists in the database.
     */
-    public Message deleteMessage(Integer ID) {
-        return messageDAO.deleteMessage(ID);
+    public Message deleteMessage(int message_id) {
+        Message deletedMessage = messageDAO.getMessage(message_id);
+        boolean deleted = messageDAO.deleteMessage(message_id);
+        if( deleted ) {
+            return deletedMessage;
+        }
+        return null;
     }
 
     /* TODO
      * ## 7: Our API should be able to update a message text identified by a message ID.
-     * - The update of a message should be successful if and only if the message id already exists and the new message_text is not blank and is not over 255 characters. If the update is successful, the response body should contain the full updated message (including message_id, posted_by, message_text, and time_posted_epoch), and the response status should be 200, which is the default. The message existing on the database should have the updated message_text.
+     * 
+     * - The update of a message should be successful if and only if the message id already exists and the 
+     *   new message_text is not blank and is not over 255 characters. If the update is successful, the response 
+     *   body should contain the full updated message (including message_id, posted_by, message_text, and 
+     *   time_posted_epoch). 
+     *   The message existing on the database should have the updated message_text.
      *  - If the update of the message is not successful for any reason, the response status should be 400. (Client error)
      * 
      * @param
@@ -140,17 +144,15 @@ public class SocialMediaService {
         return null;
     }
 
-    /* TODO
+    /* 
      * ## 8: Our API should be able to retrieve all messages written by a particular user.
-     * - The response body should contain a JSON representation of a list containing all messages posted by a particular 
-     *   user, which is retrieved from the database. It is expected for the list to simply be empty if there are no messages. 
-     *   The response status should always be 200, which is the default.
      * 
-     * @param
-     * @return
+     * @param account_id the account_id for a particular user
+     * @return List of object representations of messages retrieved from the database with the matching account_id.
+     *         List with be empty if there are no messages.
      */
-     public List<Message> getAllMessages(int ID) {
-        return messageDAO.getAllMessages(ID);
+     public List<Message> getAllMessages(int account_id) {
+        return messageDAO.getAllMessages(account_id);
      }   
 
 }
