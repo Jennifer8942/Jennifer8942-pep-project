@@ -45,21 +45,13 @@ public class SocialMediaController {
         app.post("/register", this::postAccountHandler);
         app.post("/login", this::postLoginHandler);
         app.post("/messages", this::postMessageHandler);
-        app.get("/messages", this::exampleHandler);
-        app.get("/messages/{message_id}", this::exampleHandler);
-        app.delete("/messages/{message_id}", this::exampleHandler);
-        app.patch("/messages/{message_id}", this::exampleHandler);
-        app.get("/account/{account_id}/messages",this::exampleHandler);
+        app.get("/messages", this::getAllMessagesHandler);
+        app.get("/messages/{message_id}", this::getMessageHandler);
+        app.delete("/messages/{message_id}", this::deleteMessageHandler);
+        app.patch("/messages/{message_id}", this::updateMessageHandler);
+        app.get("/account/{account_id}/messages",this::getAllAccountMessagesHandler);
 
         return app;
-    }
-
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
     }
 
     /*
@@ -92,37 +84,45 @@ public class SocialMediaController {
      * existing on the database.
      * 
      * The request body will contain a JSON representation of an Account, not containing an account_id. 
-     * - If successful, the response body should contain a JSON of the account 
-     *   in the response body, including its account_id. The response status should be 200 OK, which is the default.
+     * - If successful, the response body should contain a JSON of the account in the response body, including 
+     *   its account_id. The response status should be 200 OK, which is the default.
      * - If the login is not successful, the response status should be 401. (Unauthorized)
      * 
      * @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
     public void postLoginHandler(Context ctx) throws JsonProcessingException {
-        // TODO
         ObjectMapper mapper = new ObjectMapper();
         Account requestAccount = mapper.readValue(ctx.body(), Account.class);
         Account responseAccount = socialMediaService.login(requestAccount);
         if(responseAccount == null) {
-            ctx.status(400);
+            ctx.status(401);
         } else {
             ctx.json(mapper.writeValueAsString(responseAccount));
         }
     }
 
     /*
-     * ## 3: Our API should be able to process the creation of new messages.
-
-    As a user, I should be able to submit a new post on the endpoint POST localhost:8080/messages. The request body will contain a JSON representation of a message, which should be persisted to the database, but will not contain a message_id.
-
-    - The creation of the message will be successful if and only if the message_text is not blank, is not over 255 characters, and posted_by refers to a real, existing user. If successful, the response body should contain a JSON of the message, including its message_id. The response status should be 200, which is the default. The new message should be persisted to the database.
-    - If the creation of the message is not successful, the response status should be 400. (Client error)
-    @param ctx the context object handles HTTP requests and generates responses.
+     * Handler to process the creation of new messages.
+     * 
+     * The request body will contain a JSON representation of the message, not containing a message_id.
+     *  - If successful, the response body should contain a JSON of the message in the response body, including 
+     *    its message_id. The response status should be 200 OK, which is the default.
+     *  - If the creation of the message is not successful, the response status should be 400. (Client error)
+     * 
+     * @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
     public void postMessageHandler(Context ctx) throws JsonProcessingException {
        //TODO 
+       ObjectMapper mapper = new ObjectMapper();
+       Message requestMessage = mapper.readValue(ctx.body(), Message.class);
+       Message responseMessage = socialMediaService.getMessage(requestMessage.getMessage_id());
+       if(requestMessage != null) {
+            ctx.status(400);
+       } else {
+           ctx.json(mapper.writeValueAsString(responseMessage));
+       }
     }
 
     /*
@@ -136,7 +136,7 @@ public class SocialMediaController {
     @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
-    public void getAllMessages(Context ctx) throws JsonProcessingException {
+    public void getAllMessagesHandler(Context ctx) throws JsonProcessingException {
         //TODO
     }
 
@@ -153,7 +153,7 @@ public class SocialMediaController {
     @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
-    public void getMessage(Context ctx) throws JsonProcessingException {
+    public void getMessageHandler(Context ctx) throws JsonProcessingException {
         int message_id = Integer.parseInt(ctx.pathParam("message_id"));
         ctx.json(socialMediaService.getMessage(message_id));
     }
@@ -169,7 +169,7 @@ public class SocialMediaController {
     @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
-    public void deleteMessage(Context ctx) throws JsonProcessingException {
+    public void deleteMessageHandler(Context ctx) throws JsonProcessingException {
         //TODO
     }
 
@@ -183,7 +183,7 @@ public class SocialMediaController {
     @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
-    public void UpdateMessage(Context ctx) throws JsonProcessingException {
+    public void updateMessageHandler(Context ctx) throws JsonProcessingException {
         //TODO
     }
 

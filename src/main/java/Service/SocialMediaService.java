@@ -1,5 +1,7 @@
 package Service;
 
+import java.util.List;
+
 import DAO.AccountDAO;
 import DAO.MessageDAO;
 import Model.Account;
@@ -95,8 +97,8 @@ public class SocialMediaService {
      * @return a list containing all messages retrieved from the database. It is expected 
      * for the list to simply be empty if there are no messages.
     */
-    public Message[] getAllMessages() {
-        return null;
+    public List<Message> getAllMessages() {
+        return messageDAO.getAllMessages();
     }
 
 
@@ -104,8 +106,7 @@ public class SocialMediaService {
      * ## 5: Our API should be able to retrieve a message by its ID.
      * 
      * @ param ID the message_id for the requested message.
-     * @ return an object representation of the message identified by the message_id. It is expected for the 
-     * response body to simply be empty if there is no such message. 
+     * @ return an object representation of the message identified by the message_id. 
      */
     public Message getMessage(int ID) {
         return null;
