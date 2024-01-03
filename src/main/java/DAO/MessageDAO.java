@@ -3,6 +3,7 @@ package DAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,5 +51,37 @@ public class MessageDAO {
         }
         return messages;
     }
+
+    /*
+     * Add a message record into the database which matches the values contained in the message object.
+     * 
+     * @param message an object modelling a Message. The message object does not contain a message_id.
+     * @return The Message object matching the record inserted into the database, including a message_id.
+     */
+    public Message insertMessage(Message message) {
+        Message newMessage = null;
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            //Write SQL logic here.
+            String sql = "INSERT INTO message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?);" ;
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            //write preparedStatement's setString and setInt methods here.
+            preparedStatement.setInt(1, message.getMessage_id());
+            preparedStatement.setString(2, message.getMessage_text());
+            preparedStatement.setLong(3, message.getTime_posted_epoch);
+
+            preparedStatement.executeUpdate();
+            ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
+            if(pkeyResultSet.next()){
+                int generated_id = (int) pkeyResultSet.getLong(1);
+                newMessage = new Message(generated_id, message.getMessage_text(), message.getTime_posted_epoch());
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return newMessage;
+    }
+
 
 }

@@ -29,7 +29,7 @@ public class SocialMediaService {
      * 
      * The registration requires these conditions: the username is not blank, the password is at least 4 
      * characters long, and an Account with that username does not already exist. If all these conditions 
-     * are met, The new account should be persisted to the database.
+     * are met, the new account should be persisted to the database.
      * 
      * @param account an object representing a new account
      * @return The newly added account if the add operation was sucessful, including account_id.  
@@ -67,22 +67,33 @@ public class SocialMediaService {
 
     /*
      * ## 3: Our API should be able to process the creation of new messages.
-
-    As a user, I should be able to submit a new post on the endpoint POST localhost:8080/messages. The request body will contain a JSON representation of a message, which should be persisted to the database, but will not contain a message_id.
-
-    - The creation of the message will be successful if and only if the message_text is not blank, is not over 255 characters, and posted_by refers to a real, existing user. If successful, the response body should contain a JSON of the message, including its message_id. The response status should be 200, which is the default. The new message should be persisted to the database.
-    - If the creation of the message is not successful, the response status should be 400. (Client error)
-    */
+     * 
+     * The creation of the message will be successful if and only if the message_text is not blank, is not 
+     * over 255 characters, and posted_by refers to a real, existing user. If all these conditins are met, 
+     * the new message should be persisted to the database.
+     * 
+     * @param message an object representing a new message to be added to the database.
+     * @return the message, including message_id.
+     */
     public Message AddMessage(Message message) {
-        return null;
+        Message newMessage = null
+        if(message != null && message.getMessage_text() != null 
+                && message.getMessage_text() != null && message.getMessage_text().length() > 0
+                && message.getMessage_text().length() <= 255) {
+            
+            Account isRealUser = accountDAO.getAccountByID(message.getMessage_id());
+            if(isRealUser != null) {
+                newMessage = messageDAO.insertMessage(message);
+            }       
+        }
+        return newMessage;
     }
 
     /*
-    ## 4: Our API should be able to retrieve all messages.
-
-    As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
-
-    - The response body should contain a JSON representation of a list containing all messages retrieved from the database. It is expected for the list to simply be empty if there are no messages. The response status should always be 200, which is the default.
+     * ## 4: Our API should be able to retrieve all messages.
+     * 
+     * @return a list containing all messages retrieved from the database. It is expected 
+     * for the list to simply be empty if there are no messages.
     */
     public Message[] getAllMessages() {
         return null;
@@ -90,12 +101,12 @@ public class SocialMediaService {
 
 
     /*
-    ## 5: Our API should be able to retrieve a message by its ID.
-
-    As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages/{message_id}.
-
-    - The response body should contain a JSON representation of the message identified by the message_id. It is expected for the response body to simply be empty if there is no such message. The response status should always be 200, which is the default.
-    */
+     * ## 5: Our API should be able to retrieve a message by its ID.
+     * 
+     * @ param ID the message_id for the requested message.
+     * @ return an object representation of the message identified by the message_id. It is expected for the 
+     * response body to simply be empty if there is no such message. 
+     */
     public Message getMessage(int ID) {
         return null;
     }
