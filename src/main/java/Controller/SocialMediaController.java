@@ -20,6 +20,9 @@ public class SocialMediaController {
 
     private SocialMediaService socialMediaService;
 
+    /*
+     * default constructor
+     */
     public SocialMediaController() {
         socialMediaService = new SocialMediaService();
     }
@@ -117,8 +120,8 @@ public class SocialMediaController {
        //TODO 
        ObjectMapper mapper = new ObjectMapper();
        Message requestMessage = mapper.readValue(ctx.body(), Message.class);
-       Message responseMessage = socialMediaService.getMessage(requestMessage.getMessage_id());
-       if(requestMessage != null) {
+       Message responseMessage = socialMediaService.AddMessage(requestMessage);
+       if(requestMessage == null) {
             ctx.status(400);
        } else {
            ctx.json(mapper.writeValueAsString(responseMessage));
@@ -138,7 +141,6 @@ public class SocialMediaController {
     public void getAllMessagesHandler(Context ctx) throws JsonProcessingException {
         //TODO
     }
-
 
     /* 
      * Handler to retrieve a message by its ID.
@@ -189,7 +191,8 @@ public class SocialMediaController {
     }
 
     /* 
-     * Handler retrieve all messages written by a particular user. 
+     * Handler to retrieve all messages written by a particular user. 
+     * 
      * - The response body should contain a JSON representation of a list containing all messages posted by a particular 
      *   user, which is retrieved from the database. It is expected for the list to simply be empty if there are no messages. 
      *   The response status should always be 200, which is the default.

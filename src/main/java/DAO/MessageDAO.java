@@ -71,11 +71,12 @@ public class MessageDAO {
             preparedStatement.setString(2, message.getMessage_text());
             preparedStatement.setLong(3, message.getTime_posted_epoch());
 
-            preparedStatement.executeUpdate();
-            ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
-            if(pkeyResultSet.next()){
-                int generated_id = (int) pkeyResultSet.getLong(1);
-                newMessage = new Message(generated_id, message.getMessage_text(), message.getTime_posted_epoch());
+            ResultSet rs = preparedStatement.executeQuery();
+            if(rs.next()){
+                 newMessage = new Message(rs.getInt("message_id"), 
+                                rs.getInt("posted_by"),
+                                rs.getString("message_text"), 
+                                rs.getInt("time_posted_epoch"));
             }
         }catch(SQLException e){
             System.out.println(e.getMessage());
@@ -83,5 +84,34 @@ public class MessageDAO {
         return newMessage;
     }
 
+    /**
+     * 
+     * @param ID
+     * @return
+     */
+    public Message getMessage(int ID) {
+        Connection connection = ConnectionUtil.getConnection();
+        Message message = null;
+        
+        try {
+            //Write SQL logic here.
+            String sql = "SELECT message_id, posted_by, message_text, time_posted_epoch FROM message WHERE ID = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
+            //write preparedStatement's setString and setInt methods here.
+            preparedStatement.setInt(1, ID);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            if(rs.next()){
+                 message = new Message(rs.getInt("message_id"), 
+                                rs.getInt("posted_by"),
+                                rs.getString("message_text"), 
+                                rs.getInt("time_posted_epoch"));
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+        return message;
+    }
 }
