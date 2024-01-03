@@ -76,7 +76,7 @@ public class SocialMediaService {
      * @return the message, including message_id.
      */
     public Message AddMessage(Message message) {
-        Message newMessage = null
+        Message newMessage = null;
         if(message != null && message.getMessage_text() != null 
                 && message.getMessage_text() != null && message.getMessage_text().length() > 0
                 && message.getMessage_text().length() <= 255) {

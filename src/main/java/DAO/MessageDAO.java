@@ -69,7 +69,7 @@ public class MessageDAO {
             //write preparedStatement's setString and setInt methods here.
             preparedStatement.setInt(1, message.getMessage_id());
             preparedStatement.setString(2, message.getMessage_text());
-            preparedStatement.setLong(3, message.getTime_posted_epoch);
+            preparedStatement.setLong(3, message.getTime_posted_epoch());
 
             preparedStatement.executeUpdate();
             ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
