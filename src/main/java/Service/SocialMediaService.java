@@ -1,9 +1,6 @@
 package Service;
 
-import static org.mockito.ArgumentMatchers.intThat;
-
 import java.util.List;
-
 import DAO.AccountDAO;
 import DAO.MessageDAO;
 import Model.Account;
@@ -112,6 +109,7 @@ public class SocialMediaService {
      *         List with be empty if there are no messages.
      */
      public List<Message> getAllMessages(int account_id) {
+        System.out.println("SocialMediaService getAllMessages account_id: " + account_id); //TODO
         return messageDAO.getAllMessages(account_id);
      }   
 
@@ -126,7 +124,7 @@ public class SocialMediaService {
         return messageDAO.getMessage(message_id);
     }
 
-    /* TODO
+    /* 
      * ## 6: Our API should be able to delete a message identified by a message ID.
      * 
      * @param message_id the message_id for the message to be removed from the database.
@@ -144,18 +142,16 @@ public class SocialMediaService {
         return null;
     }
 
-    /* TODO
+    /* 
      * ## 7: Our API should be able to update a message text identified by a message ID.
      * 
      * - The update of a message should be successful if and only if the message id already exists and the 
-     *   new message_text is not blank and is not over 255 characters. If the update is successful, the response 
-     *   body should contain the full updated message (including message_id, posted_by, message_text, and 
-     *   time_posted_epoch). 
-     *   The message existing on the database should have the updated message_text.
-     *  - If the update of the message is not successful for any reason, the response status should be 400. (Client error)
+     *   new message_text is not blank and is not over 255 characters. If the update is successful, the message 
+     *   existing on the database should have the updated message_text.
      * 
-     * @param
-     * @return
+     * @param message an object representing the message to be updated (has populated message_id and message_text fields)
+     * @return an object representation of the message record that was updated (all fields populated).  Returns null
+     *         if no message exists or the update was not sucessful.
     */
     public Message updateMessage(Message message) {
         Message newMessage = null;

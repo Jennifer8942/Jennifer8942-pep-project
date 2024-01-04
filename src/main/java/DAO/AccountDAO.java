@@ -12,7 +12,7 @@ import Util.ConnectionUtil;
 
 /*
  * Mediates the transformation of data between the Java Class Account to rows in the
- * database table Account. 
+ * database table account. 
  * 
  * The database table named 'account':
  *   account_id      int             primary key
@@ -53,7 +53,7 @@ public class AccountDAO {
      * Add an account record into the database which matches the values contained in the account object.
      * 
      * @param account an object modelling an Account that does not contain an account_id.
-     * @return The generated account_id of the newly inserted account record.
+     * @return The generated account_id of the newly inserted account record in the database.
      */
     public int insertAccount(Account account) {
         Connection connection = ConnectionUtil.getConnection();
@@ -93,8 +93,8 @@ public class AccountDAO {
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, username);
+            
             ResultSet rs = preparedStatement.executeQuery();
-
             while(rs.next()){
                 account = new Account(rs.getInt("account_id"), 
                                               rs.getString("username"),
@@ -125,7 +125,6 @@ public class AccountDAO {
             ps.setString(2, password);
 
             ResultSet rs = ps.executeQuery();
-
             while(rs.next()){
                 account = new Account(rs.getInt("account_id"), 
                                               rs.getString("username"),

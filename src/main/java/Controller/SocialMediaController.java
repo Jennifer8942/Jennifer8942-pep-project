@@ -120,7 +120,6 @@ public class SocialMediaController {
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
     */
     public void postMessageHandler(Context ctx) throws JsonProcessingException {
-       //TODO 
        ObjectMapper mapper = new ObjectMapper();
        Message requestMessage = mapper.readValue(ctx.body(), Message.class);
        Message responseMessage = socialMediaService.addMessage(requestMessage);
@@ -142,7 +141,6 @@ public class SocialMediaController {
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
     public void getAllMessagesHandler(Context ctx) throws JsonProcessingException {
-        //TODO
         List<Message> messages = socialMediaService.getAllMessages();
         if(messages != null ) {
             ObjectMapper mapper = new ObjectMapper();
@@ -169,6 +167,26 @@ public class SocialMediaController {
         }
     }
 
+    /* 
+     * Handler to retrieve all messages written by a particular user. 
+     * 
+     * - The response body should contain a JSON representation of a list containing all messages posted by a particular 
+     *   user. It is expected for the list to simply be empty if there are no messages. The response status should always
+     *   be 200, which is the default.
+     * 
+     * @param ctx the context object handles HTTP requests and generates responses.
+     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
+     */
+     public void getAllAccountMessagesHandler(Context ctx) throws JsonProcessingException {
+        //TODO
+        int account_id = Integer.parseInt(ctx.pathParam("account_id"));
+        System.out.println("getAllAccountMessagesHandler account_id: " + account_id);
+        List<Message> messages = socialMediaService.getAllMessages(account_id);
+        if(messages != null ) {
+            ObjectMapper mapper = new ObjectMapper();
+            ctx.json(mapper.writeValueAsString(messages));
+        }
+     }   
 
     /*
      * Handler to delete a message identified by a message ID.
@@ -194,45 +212,27 @@ public class SocialMediaController {
     /*
      * Handler to update a message text identified by a message ID. 
      * 
-     * - The update of a message should be successful if and only if the message id already exists and the new message_text 
-     *   is not blank and is not over 255 characters. If the update is successful, the response body should contain the full 
-     *   updated message (including message_id, posted_by, message_text, and time_posted_epoch), and the response status 
-     *   should be 200, which is the default. The message existing on the database should have the updated message_text.
+     * - If the update is successful, the response body should contain the full updated message 
+     * (including message_id, posted_by, message_text, and time_posted_epoch), and the response status 
+     *   should be 200, which is the default. 
      * - If the update of the message is not successful for any reason, the response status should be 400. (Client error) 
      * 
      * @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
     public void updateMessageHandler(Context ctx) throws JsonProcessingException {
-        //TODO
         ObjectMapper mapper = new ObjectMapper();
         Message requestMessage = mapper.readValue(ctx.body(), Message.class);
+        
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        requestMessage.setMessage_id(message_id);        
         Message responseMessage = socialMediaService.updateMessage(requestMessage);
+
         if(responseMessage == null || responseMessage.getMessage_id() <= 0) {
              ctx.status(400);
         } else {
             ctx.json(mapper.writeValueAsString(responseMessage));
         }
     }
-
-    /* 
-     * Handler to retrieve all messages written by a particular user. 
-     * 
-     * - The response body should contain a JSON representation of a list containing all messages posted by a particular 
-     *   user. It is expected for the list to simply be empty if there are no messages. The response status should always
-     *   be 200, which is the default.
-     * 
-     * @param ctx the context object handles HTTP requests and generates responses.
-     * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
-    */
-     public void getAllAccountMessagesHandler(Context ctx) throws JsonProcessingException {
-        //TODO
-        int account_id = Integer.parseInt(ctx.pathParam("account_id"));
-        List<Message> messages = socialMediaService.getAllMessages(account_id);
-        if(messages != null ) {
-            ObjectMapper mapper = new ObjectMapper();
-            ctx.json(mapper.writeValueAsString(messages));
-        }
-     }   
 
 }

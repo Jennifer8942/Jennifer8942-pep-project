@@ -27,7 +27,7 @@ public class MessageDAO {
     /**
      * Retrieve all messages from the message table.
      *
-     * @return all messages.
+     * @return all messages.  List of Message objects which model a message record.
      */
     public List<Message> getAllMessages(){
         Connection connection = ConnectionUtil.getConnection();
@@ -56,7 +56,7 @@ public class MessageDAO {
      * Retrieve all messages from the message table which have the requested account_id as the posted_by value.
      *
      * @param ID the account_id for the requested posted_by.
-     * @return all messages.
+     * @return all messages.  List of Message objects.
      */
     public List<Message> getAllMessages(int ID){
         Connection connection = ConnectionUtil.getConnection();
@@ -86,7 +86,7 @@ public class MessageDAO {
      * Add a message record into the database which matches the values contained in the message object.
      * 
      * @param message an object modelling a Message. The message object does not contain a message_id.
-     * @return The newly created message_id of the object matching the record inserted into the database.
+     * @return the generated message_id of the newly inserted message record in the database.
      */
     public int insertMessage(Message message) {
         Connection connection = ConnectionUtil.getConnection();
@@ -112,10 +112,11 @@ public class MessageDAO {
     }
 
     /*
-     * Update a message record into the database which matches the values contained in the message object.
+     * Update a message record's message_text field in the database which matches the values 
+     * contained in the message object.
      * 
-     * @param message an object modelling a Message. The message object does not contain a message_id.
-     * @return The Message object matching the record updated in the database.
+     * @param message an object modelling a Message. 
+     * @return The message_id of the record updated in the database.
      */
     public int updateMessageText(Message message) {
         Connection connection = ConnectionUtil.getConnection();
@@ -129,7 +130,7 @@ public class MessageDAO {
             ps.setInt(2, message.getMessage_id());
 
             int result = ps.executeUpdate();
-            if(result >= 0) {
+            if(result > 0) {
                 id = message.getMessage_id();
             }
         }catch(SQLException e){
