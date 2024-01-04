@@ -1,5 +1,7 @@
 package Service;
 
+import static org.mockito.ArgumentMatchers.intThat;
+
 import java.util.List;
 
 import DAO.AccountDAO;
@@ -44,7 +46,8 @@ public class SocialMediaService {
         if( username != null && password != null && password.length() >=4 && username.length() > 0) {
             Account existingAccount = accountDAO.getAccountByUsername(username);
             if(existingAccount == null) {
-                newAccount = accountDAO.insertAccount(account);
+                int new_account_id = accountDAO.insertAccount(account);
+                newAccount = accountDAO.getAccountByID(new_account_id);
             }
         }
         return newAccount;
@@ -84,7 +87,8 @@ public class SocialMediaService {
             
             Account isRealUser = accountDAO.getAccountByID(message.getPosted_by());
             if(isRealUser != null) {
-                newMessage = messageDAO.insertMessage(message);
+                int new_message_id = messageDAO.insertMessage(message);
+                newMessage = messageDAO.getMessage(new_message_id);
             }       
         }
         return newMessage;
@@ -99,6 +103,17 @@ public class SocialMediaService {
     public List<Message> getAllMessages() {
         return messageDAO.getAllMessages();
     }
+
+    /* 
+     * ## 8: Our API should be able to retrieve all messages written by a particular user.
+     * 
+     * @param account_id the account_id for a particular user
+     * @return List of object representations of messages retrieved from the database with the matching account_id.
+     *         List with be empty if there are no messages.
+     */
+     public List<Message> getAllMessages(int account_id) {
+        return messageDAO.getAllMessages(account_id);
+     }   
 
 
     /*
@@ -147,20 +162,10 @@ public class SocialMediaService {
         if(message != null && message.getMessage_text() != null 
                 && message.getMessage_text().length() > 0 && message.getMessage_text().length() <= 255) {
             
-            newMessage = messageDAO.updateMessage(message);
+            int new_message_id = messageDAO.updateMessageText(message);
+            newMessage = messageDAO.getMessage(new_message_id);
         }
         return newMessage;
     }
-
-    /* 
-     * ## 8: Our API should be able to retrieve all messages written by a particular user.
-     * 
-     * @param account_id the account_id for a particular user
-     * @return List of object representations of messages retrieved from the database with the matching account_id.
-     *         List with be empty if there are no messages.
-     */
-     public List<Message> getAllMessages(int account_id) {
-        return messageDAO.getAllMessages(account_id);
-     }   
 
 }

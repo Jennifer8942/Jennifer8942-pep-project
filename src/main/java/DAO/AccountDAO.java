@@ -14,7 +14,7 @@ import Util.ConnectionUtil;
  * Mediates the transformation of data between the Java Class Account to rows in the
  * database table Account. 
  * 
- * The database table names 'account':
+ * The database table named 'account':
  *   account_id      int             primary key
  *   username        varchar(255)    unique
  *   password        varchar(255)
@@ -26,7 +26,7 @@ public class AccountDAO {
     /**
      * Retrieve all accounts from the account table.
      *
-     * @return all accounts.
+     * @return all accounts. List of Account objects which model an account record.
      */
     public List<Account> getAllAccounts(){
         Connection connection = ConnectionUtil.getConnection();
@@ -52,38 +52,37 @@ public class AccountDAO {
     /*
      * Add an account record into the database which matches the values contained in the account object.
      * 
-     * @param account an object modelling an Account. the account object does not contain an account_id.
-     * @return The Account object matching the record inserted into the database, including an account_id.
+     * @param account an object modelling an Account that does not contain an account_id.
+     * @return The generated account_id of the newly inserted account record.
      */
-    public Account insertAccount(Account account) {
-        Account newAccount = null;
+    public int insertAccount(Account account) {
         Connection connection = ConnectionUtil.getConnection();
+        int generated_account_id = 0;
         try {
             //Write SQL logic here.
             String sql = "INSERT INTO account (username, password) VALUES (?, ?);" ;
-            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             //write preparedStatement's setString and setInt methods here.
-            preparedStatement.setString(1, account.getUsername());
-            preparedStatement.setString(2, account.getPassword());
+            ps.setString(1, account.getUsername());
+            ps.setString(2, account.getPassword());
+            ps.executeUpdate();
 
-            preparedStatement.executeUpdate();
-            ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
-            if(pkeyResultSet.next()){
-                int generated_account_id = (int) pkeyResultSet.getLong(1);
-                newAccount = new Account(generated_account_id, account.getUsername(), account.getPassword());
+            ResultSet pkrs = ps.getGeneratedKeys();
+            while(pkrs.next()){
+                generated_account_id = (int) pkrs.getLong(1);
             }
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
-        return newAccount;
+        return generated_account_id;
     }
 
     /*
      * Get an account record from the database account table, which has a matching username.
      * 
      * @param username the account username.
-     * @return The Account with matching username and password, including account_id. 
+     * @return The Account with matching username, including account_id. Null if does not exist.
      */
     public Account getAccountByUsername(String username) {
         Connection connection = ConnectionUtil.getConnection();
@@ -112,19 +111,20 @@ public class AccountDAO {
      * 
      * @param username the account username
      * @param password the account password
-     * @return The Account with matching username and password, including account_id.
+     * @return The Account with matching username and password, including account_id.  Null if does not exist.
      */
     public Account getAccountByLogin(String username, String password) {
         Connection connection = ConnectionUtil.getConnection();
         Account account = null;
         try {
-            //Write SQL logic here
+            // Select account with matching username and password
             String sql = "SELECT account_id, username, password FROM account WHERE username = ? and password = ?;";
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            ResultSet rs = preparedStatement.executeQuery();
+            PreparedStatement ps= connection.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
                 account = new Account(rs.getInt("account_id"), 
@@ -150,10 +150,10 @@ public class AccountDAO {
             //Write SQL logic here
             String sql = "SELECT account_id, username, password FROM account WHERE account_id = ?;";
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, ID);
-            ResultSet rs = preparedStatement.executeQuery();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, ID);
 
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 account = new Account(rs.getInt("account_id"), 
                                               rs.getString("username"),

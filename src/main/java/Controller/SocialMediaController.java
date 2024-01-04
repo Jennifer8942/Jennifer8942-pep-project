@@ -219,8 +219,8 @@ public class SocialMediaController {
      * Handler to retrieve all messages written by a particular user. 
      * 
      * - The response body should contain a JSON representation of a list containing all messages posted by a particular 
-     *   user, which is retrieved from the database. It is expected for the list to simply be empty if there are no messages. 
-     *   The response status should always be 200, which is the default.
+     *   user. It is expected for the list to simply be empty if there are no messages. The response status should always
+     *   be 200, which is the default.
      * 
      * @param ctx the context object handles HTTP requests and generates responses.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
