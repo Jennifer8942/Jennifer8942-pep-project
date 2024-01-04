@@ -62,9 +62,7 @@ public class SocialMediaService {
     public Account login(Account account) {
         String username = account.getUsername();
         String password = account.getPassword();
-        Account validAccount = accountDAO.getAccountByLogin(username, password); 
-        
-        return validAccount;
+        return accountDAO.getAccountByLogin(username, password); 
     }
 
     /*
@@ -109,7 +107,6 @@ public class SocialMediaService {
      *         List with be empty if there are no messages.
      */
      public List<Message> getAllMessages(int account_id) {
-        System.out.println("SocialMediaService getAllMessages account_id: " + account_id); //TODO
         return messageDAO.getAllMessages(account_id);
      }   
 

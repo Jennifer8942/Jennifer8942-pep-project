@@ -55,7 +55,7 @@ public class SocialMediaController {
         app.get("/messages/{message_id}", this::getMessageHandler);
         app.delete("/messages/{message_id}", this::deleteMessageHandler);
         app.patch("/messages/{message_id}", this::updateMessageHandler);
-        app.get("/account/{account_id}/messages",this::getAllAccountMessagesHandler);
+        app.get("/accounts/{account_id}/messages", this::getAllAccountMessagesHandler);
 
         return app;
     }
@@ -178,9 +178,7 @@ public class SocialMediaController {
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object.
      */
      public void getAllAccountMessagesHandler(Context ctx) throws JsonProcessingException {
-        //TODO
         int account_id = Integer.parseInt(ctx.pathParam("account_id"));
-        System.out.println("getAllAccountMessagesHandler account_id: " + account_id);
         List<Message> messages = socialMediaService.getAllMessages(account_id);
         if(messages != null ) {
             ObjectMapper mapper = new ObjectMapper();
