@@ -7,8 +7,7 @@ import Model.Account;
 import Model.Message;
 
 /*
- * to design and create your own Service classes from scratch.
- * You should refer to prior mini-project lab examples and course material for guidance.
+ * Provides services to the Social Media Application.  Holds business logic and handles calls to the Data Access classes.
  * 
  * @author Jennifer Gardner
  */

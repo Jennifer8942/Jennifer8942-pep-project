@@ -12,9 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
- * found in readme.md as well as the test cases. You should refer to prior mini-project labs and lecture materials for 
- * guidance on how a controller may be built.
+ * Handles the HTTP endpoints for the Social Media Application.
  * 
  * @author Jennifer Gardner
  * @since December 19, 2023
